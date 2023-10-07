@@ -1,8 +1,7 @@
 package blank
 
 import (
-	"bytes"
-	"encoding/gob"
+	"encoding/json"
 	"io"
 
 	"github.com/portal-co/blank/buf"
@@ -27,7 +26,7 @@ func (u *UnSeq) ReadBlock() ([]byte, error) {
 			return nil, err
 		}
 		var f SeqFrame
-		err = gob.NewDecoder(bytes.NewBuffer(b)).Decode(&f)
+		err = json.Unmarshal(b, &f)
 		if err != nil {
 			return nil, err
 		}
@@ -46,7 +45,8 @@ type Seq struct {
 func (s *Seq) Write(x []byte) (int, error) {
 	b, d := buf.Buffer(s.WriteCloser)
 	defer d()
-	err := gob.NewEncoder(b).Encode(SeqFrame{s.C, x})
+	// err := gob.NewEncoder(b).Encode(SeqFrame{s.C, x})
+	err := json.NewEncoder(b).Encode(SeqFrame{s.C, x})
 	if err != nil {
 		return 0, err
 	}

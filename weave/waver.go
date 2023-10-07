@@ -1,8 +1,7 @@
 package weave
 
 import (
-	"bytes"
-	"encoding/gob"
+	"encoding/json"
 	"io"
 	"sync"
 
@@ -38,7 +37,7 @@ func (w *WvReader) readBlock(x string) ([]byte, error) {
 				return nil, err
 			}
 			// var f SeqFrame
-			err = gob.NewDecoder(bytes.NewBuffer(b)).Decode(&f)
+			err = json.Unmarshal(b, &f)
 			if err != nil {
 				return nil, err
 			}
@@ -69,7 +68,7 @@ type WvWriter struct {
 func (w WvWriter) Write(p []byte) (int, error) {
 	b, d := buf.Buffer(w.WriteCloser)
 	defer d()
-	err := gob.NewEncoder(b).Encode(WvFrame{w.Target, p})
+	err := json.NewEncoder(b).Encode(WvFrame{w.Target, p})
 	if err != nil {
 		return 0, err
 	}
