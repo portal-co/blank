@@ -61,11 +61,21 @@ func (b *Unblocker) Read(x []byte) (int, error) {
 	return b.Buf.Read(x)
 }
 
+type GobUnblockinator struct {
+	io.WriteCloser
+}
+
+func (g GobUnblockinator) Write(p []byte) (n int, err error) {
+	err = gob.NewEncoder(g.WriteCloser).Encode(p)
+	n = len(p)
+	return
+}
+
 func MakeBlockRWC(x io.ReadWriteCloser, n int) BlockRWC {
 	return BWWC{Blockinator{x, n}, x}
 }
 func MakeGobBlockRWC(x io.ReadWriteCloser) BlockRWC {
-	return BWWC{GobBlockinator{x}, x}
+	return BWWC{GobBlockinator{x}, GobUnblockinator{x}}
 }
 func MakeUnblockRWC(x BlockRWC) io.ReadWriteCloser {
 	return RWWC{&Unblocker{x, bytes.Buffer{}}, x}
