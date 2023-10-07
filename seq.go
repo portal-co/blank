@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"encoding/gob"
 	"io"
+
+	"github.com/portal-co/blank/buf"
 )
 
 type SeqFrame struct {
@@ -42,7 +44,9 @@ type Seq struct {
 }
 
 func (s *Seq) Write(x []byte) (int, error) {
-	err := gob.NewEncoder(s.WriteCloser).Encode(SeqFrame{s.C, x})
+	b, d := buf.Buffer(s.WriteCloser)
+	defer d()
+	err := gob.NewEncoder(b).Encode(SeqFrame{s.C, x})
 	if err != nil {
 		return 0, err
 	}

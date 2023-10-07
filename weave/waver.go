@@ -7,6 +7,7 @@ import (
 	"sync"
 
 	"github.com/portal-co/blank"
+	"github.com/portal-co/blank/buf"
 )
 
 type WvFrame struct {
@@ -66,7 +67,9 @@ type WvWriter struct {
 }
 
 func (w WvWriter) Write(p []byte) (int, error) {
-	err := gob.NewEncoder(w.WriteCloser).Encode(WvFrame{w.Target, p})
+	b, d := buf.Buffer(w.WriteCloser)
+	defer d()
+	err := gob.NewEncoder(b).Encode(WvFrame{w.Target, p})
 	if err != nil {
 		return 0, err
 	}
