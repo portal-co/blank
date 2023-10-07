@@ -2,6 +2,7 @@ package blank
 
 import (
 	"bytes"
+	"encoding/gob"
 	"io"
 )
 
@@ -34,6 +35,16 @@ func (b Blockinator) ReadBlock() ([]byte, error) {
 	return x[:n], nil
 }
 
+type GobBlockinator struct {
+	io.Reader
+}
+
+func (b GobBlockinator) ReadBlock() ([]byte, error) {
+	var x []byte
+	err := gob.NewDecoder(b.Reader).Decode(&x)
+	return x, err
+}
+
 type Unblocker struct {
 	BlockReader
 	Buf bytes.Buffer
@@ -52,6 +63,9 @@ func (b *Unblocker) Read(x []byte) (int, error) {
 
 func MakeBlockRWC(x io.ReadWriteCloser, n int) BlockRWC {
 	return BWWC{Blockinator{x, n}, x}
+}
+func MakeGobBlockRWC(x io.ReadWriteCloser) BlockRWC {
+	return BWWC{GobBlockinator{x}, x}
 }
 func MakeUnblockRWC(x BlockRWC) io.ReadWriteCloser {
 	return RWWC{&Unblocker{x, bytes.Buffer{}}, x}
