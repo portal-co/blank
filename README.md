@@ -1,13 +1,14 @@
 # blank
 
 ## Description
-Project blank
+A Go module serving as a template or utility, incorporating file system abstractions (`hackpadfs`) and potentially sequence logic (`seq.go`).
 
 ## Goals
-- [ ] Add project goals
+- [ ] Provide blank/template structures
+- [ ] Implement file system interfaces
 
 ## Progress
-- [ ] Initial setup
+- [ ] Module initialized (Go 1.21)
 
 ---
 *AI assisted*
